@@ -12,7 +12,7 @@ zabbix_export:
         
         cnPilot e700
       templates:
-        - name: 'Template Module Generic SNMPv2'
+        - name: 'Template Module ICMP Ping'
       groups:
         - name: Templates
       items:
@@ -33,7 +33,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.17713.22.1.1.1.3.0
           key: .1.3.6.1.4.1.17713.22.1.1.1.3.0
-          delay: 24h
+          delay: 1d
           history: 1d
           trends: '0'
           value_type: CHAR
@@ -81,7 +81,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.17713.22.1.1.1.12.0
           key: cambiumAPCnmConstaus
-          delay: 1h
+          delay: 1d
           history: 30d
           trends: '0'
           value_type: TEXT
@@ -120,7 +120,22 @@ zabbix_export:
           units: '%'
           tags:
             - tag: Application
-              value: Hardware
+              value: Memory
+        - uuid: de4926865a594369a5e649048327bd0f
+          name: 'Used Memory'
+          type: CALCULATED
+          key: cambiumAPMemoryUsed
+          trends: 180d
+          units: '%'
+          params: '100 - last(//cambiumAPMemoryFree)'
+          tags:
+            - tag: Application
+              value: Memory
+          triggers:
+            - uuid: 98961ea77a0446abb457313aa6f1bb8c
+              expression: 'avg(/Template Cambium Wifi SNMPv2/cambiumAPMemoryUsed,5m)>=80'
+              name: 'High memory utilization'
+              priority: HIGH
         - uuid: a3335c4de8a04c4089fae2764de57cae
           name: 'AP Model'
           type: SNMP_AGENT
@@ -147,22 +162,93 @@ zabbix_export:
           tags:
             - tag: Application
               value: Status
+        - uuid: 13d718b1a201470d82112d5c7e2c30a2
+          name: 'System contact'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: 'system.contact[sysContact.0]'
+          delay: 1d
+          history: 1d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: CONTACT
+          tags:
+            - tag: Application
+              value: General
+        - uuid: 9f541083a1e84a60850f4559371b9ca8
+          name: 'System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'system.descr[sysDescr.0]'
+          delay: 1d
+          history: 1d
+          trends: '0'
+          value_type: CHAR
+          tags:
+            - tag: Application
+              value: General
+        - uuid: 0289dff7896946f6bf11890998cd3537
+          name: 'System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: 'system.location[sysLocation.0]'
+          delay: 1d
+          history: 1d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: LOCATION
+          tags:
+            - tag: Application
+              value: General
+        - uuid: 4bcb5bf3539442958ac3fb904809c94b
+          name: 'System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 1d
+          history: 1d
+          trends: '0'
+          value_type: CHAR
+          inventory_link: NAME
+          tags:
+            - tag: Application
+              value: General
+        - uuid: d31f868e1f104cc998b0b881ab24eb1e
+          name: 'System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: 'system.objectid[sysObjectID.0]'
+          delay: 1d
+          history: 1d
+          trends: '0'
+          value_type: CHAR
+          tags:
+            - tag: Application
+              value: General
+        - uuid: d603692997c347d691ad9f22ae0b6689
+          name: 'SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          tags:
+            - tag: Application
+              value: Status
       discovery_rules:
         - uuid: 3dd8c39411e344199b17949276025881
           name: RADIO
           type: SNMP_AGENT
-          snmp_oid: 'discovery[{#INDEX},.1.3.6.1.4.1.17713.22.1.2.1.1,{#BAND},.1.3.6.1.4.1.17713.22.1.2.1.3,{#CHANNEL},.1.3.6.1.4.1.17713.22.1.2.1.6,{#WIDTH},.1.3.6.1.4.1.17713.22.1.2.1.7,{#POWER},.1.3.6.1.4.1.17713.22.1.2.1.8,{#TXDATA},.1.3.6.1.4.1.17713.22.1.2.1.11,{#RXDATA},.1.3.6.1.4.1.17713.22.1.2.1.12,{#STATUS},.1.3.6.1.4.1.17713.22.1.2.1.13,{#NOISEFLOOR},.1.3.6.1.4.1.17713.22.1.2.1.16,{#INTERFERENCE},.1.3.6.1.4.1.17713.22.1.2.1.17,{#AIRTIME},.1.3.6.1.4.1.17713.22.1.2.1.18]'
+          snmp_oid: 'discovery[{#BAND},.1.3.6.1.4.1.17713.22.1.2.1.3,{#CHANNEL},.1.3.6.1.4.1.17713.22.1.2.1.6,{#WIDTH},.1.3.6.1.4.1.17713.22.1.2.1.7,{#POWER},.1.3.6.1.4.1.17713.22.1.2.1.8,{#TXDATA},.1.3.6.1.4.1.17713.22.1.2.1.11,{#RXDATA},.1.3.6.1.4.1.17713.22.1.2.1.12,{#STATUS},.1.3.6.1.4.1.17713.22.1.2.1.13,{#NOISEFLOOR},.1.3.6.1.4.1.17713.22.1.2.1.16,{#INTERFERENCE},.1.3.6.1.4.1.17713.22.1.2.1.17,{#AIRTIME},.1.3.6.1.4.1.17713.22.1.2.1.18]'
           key: radio.discovery
           delay: 1d
           lifetime: 1d
           item_prototypes:
             - uuid: 4f4eb91d376c4f6fabc0e042762771dc
-              name: 'Radio {#INDEX} - Airtime'
+              name: 'Radio {#SNMPINDEX} - Airtime'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.18.{#SNMPINDEX}'
               key: 'airtime[{#SNMPINDEX}]'
               delay: 1h
-              history: 30d
+              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Radio airtime (total/tx/rx/busy)'
@@ -170,7 +256,7 @@ zabbix_export:
                 - tag: Application
                   value: Radio
             - uuid: 50d057d166ef4b6ca46e2930feb179df
-              name: 'Radio {#INDEX} - Band Type'
+              name: 'Radio {#SNMPINDEX} - Band Type'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.3.{#SNMPINDEX}'
               key: 'band[{#SNMPINDEX}]'
@@ -182,18 +268,18 @@ zabbix_export:
                 - tag: Application
                   value: Radio
             - uuid: 534179f33f764399a137af060caff72e
-              name: 'Radio {#INDEX} - Channel'
+              name: 'Radio {#SNMPINDEX} - Channel'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.6.{#SNMPINDEX}'
               key: 'channel[{#SNMPINDEX}]'
-              delay: 1d
+              delay: 12h
               history: 7d
               trends: '0'
               tags:
                 - tag: Application
                   value: Radio
             - uuid: 5be3d4e3e859461bae1a7906f4b285c4
-              name: 'Radio {#INDEX} - Channel Interference'
+              name: 'Radio {#SNMPINDEX} - Channel Interference'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.17.{#SNMPINDEX}'
               key: 'interference[{#SNMPINDEX}]'
@@ -205,7 +291,7 @@ zabbix_export:
                 - tag: Application
                   value: Radio
             - uuid: 36c015b2ddd1406d8f9edb86b3e64d63
-              name: 'Radio {#INDEX} - Noise Floor'
+              name: 'Radio {#SNMPINDEX} - Noise Floor'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.16.{#SNMPINDEX}'
               key: 'noisefloor[{#SNMPINDEX}]'
@@ -213,16 +299,28 @@ zabbix_export:
               history: 30d
               trends: '0'
               value_type: FLOAT
-              description: 'Radio noise floor'
               tags:
                 - tag: Application
                   value: Radio
+              trigger_prototypes:
+                - uuid: cae653125ea84a7abf85eff28f10acbd
+                  expression: 'avg(/Template Cambium Wifi SNMPv2/noisefloor[{#SNMPINDEX}],10m)>=-25 and avg(/Template Cambium Wifi SNMPv2/noisefloor[{#SNMPINDEX}],10m)<-15'
+                  name: 'Average signal noise on Radio {#INDEX}'
+                  priority: AVERAGE
+                  description: 'https://www.netspotapp.com/pt/wifi-troubleshooting/signal-to-noise-ratio.html'
+                  manual_close: 'YES'
+                - uuid: fcb799acbfab4ad29f141e2b83376f03
+                  expression: 'avg(/Template Cambium Wifi SNMPv2/noisefloor[{#SNMPINDEX}],5m)>=-15'
+                  name: 'High signal noise on Radio {#INDEX}'
+                  priority: HIGH
+                  description: 'https://www.netspotapp.com/pt/wifi-troubleshooting/signal-to-noise-ratio.html'
+                  manual_close: 'YES'
             - uuid: 41d96534989f4d33ad8e45b766c1527b
-              name: 'Radio {#INDEX} - Transmit Power'
+              name: 'Radio {#SNMPINDEX} - Transmit Power'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.8.{#SNMPINDEX}'
               key: 'power[{#SNMPINDEX}]'
-              delay: 1d
+              delay: 12h
               history: 7d
               trends: '0'
               units: dBm
@@ -230,12 +328,11 @@ zabbix_export:
                 - tag: Application
                   value: Radio
             - uuid: 84ba3496a375430fa8fd0f62cec61f3b
-              name: 'Radio {#INDEX} - Throughput (Downlink)'
+              name: 'Radio {#SNMPINDEX} - Throughput (Downlink)'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.12.{#SNMPINDEX}'
               key: 'rxdata[{#SNMPINDEX}]'
-              history: 180d
-              trends: '0'
+              trends: 180d
               units: bps
               description: 'Received data packets in bytes by a radio'
               preprocessing:
@@ -246,11 +343,11 @@ zabbix_export:
                 - tag: Application
                   value: Radio
             - uuid: a58c33fa2fc54a39ba33b0729d12f5f1
-              name: 'Radio {#INDEX} - Status'
+              name: 'Radio {#SNMPINDEX} - Status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.13.{#SNMPINDEX}'
               key: 'status[{#SNMPINDEX}]'
-              delay: 1h
+              delay: 30m
               history: 30d
               trends: '0'
               value_type: CHAR
@@ -260,13 +357,17 @@ zabbix_export:
               tags:
                 - tag: Application
                   value: Radio
+              trigger_prototypes:
+                - uuid: abb1c87d080c4fe4ad3331f01bef0ecf
+                  expression: 'change(/Template Cambium Wifi SNMPv2/status[{#SNMPINDEX}])'
+                  name: 'Radio {#INDEX} - Status change'
+                  priority: INFO
             - uuid: 00c4e2d1adfc456ca99b2efbb888d520
-              name: 'Radio {#INDEX} - Throughput (Uplink)'
+              name: 'Radio {#SNMPINDEX} - Throughput (Uplink)'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.11.{#SNMPINDEX}'
               key: 'txdata[{#SNMPINDEX}]'
-              history: 180d
-              trends: '0'
+              trends: 180d
               units: bps
               description: 'Transmitted data packets in bytes by a radio'
               preprocessing:
@@ -277,7 +378,7 @@ zabbix_export:
                 - tag: Application
                   value: Radio
             - uuid: 528506d43cde4a819edde321699e4375
-              name: 'Radio {#INDEX} - Channel Width'
+              name: 'Radio {#SNMPINDEX} - Channel Width'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.2.1.7.{#SNMPINDEX}'
               key: 'width[{#SNMPINDEX}]'
@@ -288,6 +389,22 @@ zabbix_export:
               tags:
                 - tag: Application
                   value: Radio
+          graph_prototypes:
+            - uuid: d602a51773c041328844070dff18a00f
+              name: 'Radio {#INDEX} - Throughput'
+              show_triggers: 'NO'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: 199C0D
+                  item:
+                    host: 'Template Cambium Wifi SNMPv2'
+                    key: 'rxdata[{#SNMPINDEX}]'
+                - sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template Cambium Wifi SNMPv2'
+                    key: 'txdata[{#SNMPINDEX}]'
         - uuid: 0f51295ddc3b4249b37e7c3c1a2b34e9
           name: WLAN
           type: SNMP_AGENT
@@ -366,7 +483,7 @@ zabbix_export:
               history: 1d
               trends: '0'
               value_type: CHAR
-              description: 'Radio band configuration on Wlan (2.4GHz, 5GHz)'
+              description: 'Radio band on Wlan (2.4GHz, 5GHz)'
               tags:
                 - tag: Application
                   value: WLAN
@@ -375,7 +492,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.4.1.11.{#SNMPINDEX}'
               key: 'wlanrxdata[{#SNMPINDEX}]'
-              trends: '0'
+              trends: 180d
               value_type: FLOAT
               units: bps
               description: 'Total bytes received'
@@ -396,7 +513,7 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.17713.22.1.4.1.9.{#SNMPINDEX}'
               key: 'wlantxdata[{#SNMPINDEX}]'
-              trends: '0'
+              trends: 180d
               value_type: FLOAT
               units: bps
               description: 'Total bytes transmitted'
@@ -412,6 +529,22 @@ zabbix_export:
               tags:
                 - tag: Application
                   value: WLAN
+          graph_prototypes:
+            - uuid: ddafe9422e1a456c99f255def72654b1
+              name: 'WLAN {#SNMPINDEX} - Throughput'
+              show_triggers: 'NO'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: 199C0D
+                  item:
+                    host: 'Template Cambium Wifi SNMPv2'
+                    key: 'wlanrxdata[{#SNMPINDEX}]'
+                - sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Template Cambium Wifi SNMPv2'
+                    key: 'wlantxdata[{#SNMPINDEX}]'
       valuemaps:
         - uuid: c7f78f263ac8405fb800577158e0b663
           name: Status
@@ -424,3 +557,36 @@ zabbix_export:
               newvalue: '1'
             - value: 'OFF'
               newvalue: '0'
+  graphs:
+    - uuid: 34836f1b4f224ff98999efb7839ddba1
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 199C0D
+          item:
+            host: 'Template Cambium Wifi SNMPv2'
+            key: cambiumAPCPUUtilization
+    - uuid: 8b6cd8a0647f4a5c97dab3974584fb9d
+      name: 'Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 199C0D
+          item:
+            host: 'Template Cambium Wifi SNMPv2'
+            key: cambiumAPMemoryUsed
+    - uuid: 41418edcf5464188aa7873d5a9428e44
+      name: Uptime
+      height: '250'
+      yaxismax: '0'
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: PIE
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Template Cambium Wifi SNMPv2'
+            key: cambiumAPUptime
